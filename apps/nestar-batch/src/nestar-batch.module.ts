@@ -4,7 +4,7 @@ import { NestarBatchService } from './nestar-batch.service';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
-	imports: [ConfigModule.forRoot({ envFilePath: 'apps/.env' })],
+	imports: [ConfigModule.forRoot()],
 	controllers: [NestarBatchController],
 	providers: [NestarBatchService],
 })
