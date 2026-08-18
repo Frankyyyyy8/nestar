@@ -17,13 +17,13 @@ export class MemberService {
 			// TODO:  Authentication via TOKEN
 			return result;
 		} catch (err) {
-			console.log('Error, Service.model:', err);
-			throw new BadRequestException(err);
+			console.log('Error, Service.model:', (err as Error).message);
+			throw new BadRequestException(Message.USED_MEMBER_NICK_OR_PHONE);
 		}
 	}
 
 	public async login(input: LoginInput): Promise<Member> {
-const { memberNick, memberPassword } = input;
+		const { memberNick, memberPassword } = input;
 		const response: Member = (await this.memberModel
 			.findOne({ memberNick: memberNick })
 			.select('+memberPassword')
@@ -39,7 +39,8 @@ const { memberNick, memberPassword } = input;
 		const isMatch = memberPassword === response.memberPassword;
 		if (!isMatch) throw new InternalServerErrorException(Message.WRONG_PASSWORD);
 
-		return response;	}
+		return response;
+	}
 
 	public async updateMember(): Promise<string> {
 		return 'updateMember executed!';
