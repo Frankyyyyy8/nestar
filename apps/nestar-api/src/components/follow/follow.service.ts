@@ -4,7 +4,7 @@ import { Follower, Followers, Following, Followings } from '../../libs/dto/follo
 import { MemberService } from '../member/member.service';
 import { Model, ObjectId } from 'mongoose';
 import { Direction, Message } from '../../libs/enums/common.enum';
-import { lookupFollowerData, lookupFollowingData } from '../../libs/config';
+import { lookupAuthMemberLiked, lookupFollowerData, lookupFollowingData } from '../../libs/config';
 import { FollowInquiry } from '../../libs/dto/follow/follow.input';
 import { T } from '../../libs/types/common';
 
@@ -47,7 +47,6 @@ export class FollowService {
 		}
 	}
 
-
 	public async unsubscribe(followerId: ObjectId, followingId: ObjectId): Promise<Follower> {
 		const targetMember = await this.memberService.getMember(null, followingId);
 
@@ -70,7 +69,7 @@ export class FollowService {
 		return result;
 	}
 
-    public async getMemberFollowings(memberId: ObjectId, input: FollowInquiry): Promise<Followings> {
+	public async getMemberFollowings(memberId: ObjectId, input: FollowInquiry): Promise<Followings> {
 		const { page, limit, search } = input;
 		if (!search?.followerId) throw new InternalServerErrorException(Message.BAD_REQUEST);
 
@@ -86,7 +85,7 @@ export class FollowService {
 						list: [
 							{ $skip: (input.page - 1) * input.limit },
 							{ $limit: input.limit },
-							//meLiked
+							lookupAuthMemberLiked(memberId, '$followingId'),
 							//meFollowed
 							lookupFollowingData,
 							{ $unwind: '$followingData' },
@@ -117,7 +116,7 @@ export class FollowService {
 						list: [
 							{ $skip: (page - 1) * limit },
 							{ $limit: limit },
-							//meLiked
+							lookupAuthMemberLiked(memberId, '$followerId'),
 							//meFollowed
 							lookupFollowerData,
 							{ $unwind: '$followerData' },
